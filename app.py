@@ -1,5 +1,14 @@
 import sys
-from PySide6.QtWidgets import QApplication, QMainWindow, QLabel, QWidget, QVBoxLayout
+from PySide6.QtWidgets import (
+  QApplication,
+  QMainWindow,
+  QPushButton,
+  QWidget,
+  QVBoxLayout,
+  QLabel,
+)
+from PySide6.QtGui import QPixmap
+
 from PySide6.QtCore import Qt
 
 
@@ -16,10 +25,21 @@ class MainWindow(QMainWindow):
     layout = QVBoxLayout()
     central_widget.setLayout(layout)
 
-    label = QLabel("Hello world")
-    label.setAlignment(Qt.AlignCenter)
+    self.label = QLabel("Hello world")
+    self.label.setAlignment(Qt.AlignCenter)
 
-    layout.addWidget(label)
+    button = QPushButton("Load ")
+    layout.addWidget(button)
+
+    pixmap = QPixmap("71.jpg")
+    self.label.setPixmap(pixmap)
+
+    layout.addWidget(self.label)
+
+    button.clicked.connect(self.on_button_click)
+
+  def on_button_click(self):
+    self.label.setText("Кнопка нажата")
 
 
 if __name__ == "__main__":
