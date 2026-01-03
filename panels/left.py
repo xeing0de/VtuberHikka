@@ -2,6 +2,7 @@ from PySide6.QtGui import QPixmap, QPainter, QPen, QColor
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QGraphicsView, QGraphicsScene
 from PySide6.QtWidgets import QGraphicsRectItem
 from PySide6.QtCore import Qt, QRectF
+from objects import ImageObject
 
 
 class GridScene(QGraphicsScene):
@@ -39,11 +40,13 @@ class LeftPanel(QWidget):
     self.scene = GridScene(self, grid_size=25)
     self.view = QGraphicsView(self.scene)
 
-    pix = QPixmap("71.jpg").scaled(300, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-    p = QPixmap("188.jpg").scaled(200, 200, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-
-    self.scene.addPixmap(pix)
-    self.scene.addPixmap(p)
+    pix = ImageObject("71.jpg")
+    p = ImageObject("188.jpg")
+    
+    p.setScale(0.2)
+    pix.setScale(0.3)
+    self.scene.addItem(pix)
+    self.scene.addItem(p)
 
     self.view.setRenderHint(QPainter.Antialiasing)
     self.view.setRenderHint(QPainter.SmoothPixmapTransform)
