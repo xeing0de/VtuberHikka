@@ -1,5 +1,5 @@
-from PySide6.QtGui import QPixmap
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel
+from PySide6.QtGui import QPixmap, QPainter
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QGraphicsView, QGraphicsScene
 from PySide6.QtCore import Qt
 
 class LeftPanel(QWidget):
@@ -8,9 +8,14 @@ class LeftPanel(QWidget):
 
     layout = QVBoxLayout(self)
 
-    self.image = QLabel()
-    self.image.setAlignment(Qt.AlignCenter)
-    self.image.setPixmap(QPixmap("71.jpg"))
+    scene = QGraphicsScene(self)
+    view = QGraphicsView(scene)
 
-    layout.addWidget(self.image)
+    pix = QPixmap("71.jpg")
+    p = QPixmap("188.jpg").scaled(200,200)
+    scene.addPixmap(pix)
+    scene.addPixmap(p)
 
+    view.setRenderHint(QPainter.Antialiasing)
+
+    layout.addWidget(view)
