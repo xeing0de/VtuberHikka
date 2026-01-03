@@ -11,35 +11,37 @@ from PySide6.QtWidgets import (
 
 
 class RightPanel(QWidget):
-  outputSizeChanged = Signal(int, int)
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.project = None
 
-  def __init__(self, parent=None):
-    super().__init__(parent)
+        layout = QVBoxLayout(self)
 
-    layout = QVBoxLayout(self)
+        self.btn_load = QPushButton("Load Project")
+        layout.addWidget(self.btn_load)
 
-    self.btn_load = QPushButton("Load")
-    layout.addWidget(self.btn_load)
+        self.btn_save = QPushButton("Save Project")
+        layout.addWidget(self.btn_save)
 
-    form = QFormLayout()
-    layout.addLayout(form)
+        form = QFormLayout()
+        layout.addLayout(form)
 
-    self.sp_w = QSpinBox()
-    self.sp_w.setRange(1, 20000)
-    self.sp_w.setValue(500)
+        self.sp_w = QSpinBox()
+        self.sp_w.setRange(1, 20000)
+        self.sp_w.setValue(500)
 
-    self.sp_h = QSpinBox()
-    self.sp_h.setRange(1, 20000)
-    self.sp_h.setValue(500)
+        self.sp_h = QSpinBox()
+        self.sp_h.setRange(1, 20000)
+        self.sp_h.setValue(500)
 
-    row = QHBoxLayout()
-    row.addWidget(QLabel("Width"))
-    row.addWidget(self.sp_w)
-    row.addWidget(QLabel("Height"))
-    row.addWidget(self.sp_h)
+        row = QHBoxLayout()
+        row.addWidget(QLabel("Width"))
+        row.addWidget(self.sp_w)
+        row.addWidget(QLabel("Height"))
+        row.addWidget(self.sp_h)
 
-    form.addRow(row)
-    layout.addStretch()
+        form.addRow(row)
+        layout.addStretch()
 
-    self.btn_start = QPushButton("Start")
-    layout.addWidget(self.btn_start)
+        self.btn_start = QPushButton("Start")
+        layout.addWidget(self.btn_start)

@@ -1,53 +1,57 @@
 import sys
 from PySide6.QtWidgets import (
-  QApplication,
-  QMainWindow,
-  QPushButton,
-  QWidget,
-  QVBoxLayout,
-  QLabel,
-  QSplitter,
-)
+        QApplication,
+        QMainWindow,
+        QPushButton,
+        QWidget,
+        QVBoxLayout,
+        QLabel,
+        QSplitter,
+        )
 from PySide6.QtCore import Qt
 
 from panels import LeftPanel, RightPanel
 from buttons import UI
+from objects import Project
 
 class MainWindow(QMainWindow):
-  def __init__(self):
-    super().__init__()
+    def __init__(self):
+        super().__init__()
+        self.project = Project("empty")
 
-    self.setWindowTitle("VTuberHikka")
-    self.resize(600, 400)
-    
-    central = QWidget()
-    self.setCentralWidget(central)
-    layout = QVBoxLayout(central)
+        self.setWindowTitle("VTuberHikka")
+        self.resize(600, 400)
 
-    #splitter
-    self.splitter = QSplitter(Qt.Horizontal)
-    layout.addWidget(self.splitter)
+        central = QWidget()
+        self.setCentralWidget(central)
+        layout = QVBoxLayout(central)
 
-    #panels
-    self.left_panel = LeftPanel()
-    self.right_panel = RightPanel()
-    
-    self.splitter.addWidget(self.left_panel)
-    self.splitter.addWidget(self.right_panel)
+        #splitter
+        self.splitter = QSplitter(Qt.Horizontal)
+        layout.addWidget(self.splitter)
 
-    w = self.width()
-    self.splitter.setSizes([int(w*0.55), int(w*0.45)])
+        #panels
+        self.left_panel = LeftPanel()
+        self.right_panel = RightPanel()
 
-    #colors
-    #self.left_panel.setStyleSheet("background-color: #2b2b2b;")
-    #self.right_panel.setStyleSheet("background-color: #1e1e1e;")
+        self.splitter.addWidget(self.left_panel)
+        self.splitter.addWidget(self.right_panel)
 
-    #buttons
-    self.ui = UI(self)
-    self.right_panel.btn_load.clicked.connect(self.ui.load_project)
+        w = self.width()
+        self.splitter.setSizes([int(w*0.55), int(w*0.45)])
 
-    self.right_panel.sp_w.valueChanged.connect(self.ui.work_space)
-    self.right_panel.sp_h.valueChanged.connect(self.ui.work_space)
+        #colors
+        #self.left_panel.setStyleSheet("background-color: #2b2b2b;")
+        #self.right_panel.setStyleSheet("background-color: #1e1e1e;")
+
+        #buttons
+        self.ui = UI(self)
+
+        self.right_panel.btn_load.clicked.connect(self.ui.load_project)
+        self.right_panel.btn_save.clicked.connect(self.ui.save_project)
+
+        self.right_panel.sp_w.valueChanged.connect(self.ui.work_space)
+        self.right_panel.sp_h.valueChanged.connect(self.ui.work_space)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
