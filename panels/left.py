@@ -1,4 +1,4 @@
-from PySide6.QtGui import QPixmap, QPainter, QPen
+from PySide6.QtGui import QPixmap, QPainter, QPen, QColor
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QGraphicsView, QGraphicsScene
 from PySide6.QtWidgets import QGraphicsRectItem
 from PySide6.QtCore import Qt, QRectF
@@ -12,7 +12,7 @@ class GridScene(QGraphicsScene):
   def drawBackground(self, painter: QPainter, rect: QRectF):
     super().drawBackground(painter, rect)
 
-    pen = QPen(Qt.lightGray)
+    pen = QPen(QColor(220, 220, 220))
     pen.setWidth(1)
     painter.setPen(pen)
 
@@ -53,8 +53,7 @@ class LeftPanel(QWidget):
     self._output_rect_item = None
 
   def update_output_rect(self, w: int, h: int):
-    # центр именно текущего вида (то, что по центру экрана view)
-    center = self.view.mapToScene(self.view.viewport().rect().center())
+    center = self.scene.sceneRect().center()
 
     rect = QRectF(center.x() - w / 2, center.y() - h / 2, w, h)
 
@@ -64,7 +63,7 @@ class LeftPanel(QWidget):
       pen.setWidth(2)
       self._output_rect_item.setPen(pen)
       self._output_rect_item.setBrush(Qt.NoBrush)
-      self._output_rect_item.setZValue(10**9)  # чтобы было поверх картинок
+      self._output_rect_item.setZValue(10**9)
       self.scene.addItem(self._output_rect_item)
 
     self._output_rect_item.setRect(rect)

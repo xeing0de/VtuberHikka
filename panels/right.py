@@ -40,3 +40,6 @@ class RightPanel(QWidget):
 
     form.addRow(row)
     layout.addStretch()
+
+    self.btn_start = QPushButton("Start")
+    layout.addWidget(self.btn_start)
