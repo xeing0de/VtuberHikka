@@ -11,6 +11,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt
 
 from panels import LeftPanel, RightPanel
+from buttons import UI
 
 class MainWindow(QMainWindow):
   def __init__(self):
@@ -27,9 +28,6 @@ class MainWindow(QMainWindow):
     self.splitter = QSplitter(Qt.Horizontal)
     layout.addWidget(self.splitter)
 
-    w = self.width()
-    self.splitter.setSizes([int(w*0.55), int(w*0.45)])
-
     #panels
     self.left_panel = LeftPanel()
     self.right_panel = RightPanel()
@@ -37,10 +35,16 @@ class MainWindow(QMainWindow):
     self.splitter.addWidget(self.left_panel)
     self.splitter.addWidget(self.right_panel)
 
+    w = self.width()
+    self.splitter.setSizes([int(w*0.55), int(w*0.45)])
 
-  def on_button_click(self):
-    self.label.setText("Кнопка нажата")
+    #colors
+    #self.left_panel.setStyleSheet("background-color: #2b2b2b;")
+    #self.right_panel.setStyleSheet("background-color: #1e1e1e;")
 
+    #buttons
+    self.ui = UI(self)
+    self.right_panel.btn_load.clicked.connect(self.ui.load_project)
 
 if __name__ == "__main__":
   app = QApplication(sys.argv)
