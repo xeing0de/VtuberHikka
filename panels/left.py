@@ -1,6 +1,34 @@
-from PySide6.QtGui import QPixmap, QPainter
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QGraphicsView, QGraphicsScene
-from PySide6.QtCore import Qt
+from PySide6.QtGui import QPixmap, QPainter, QPen
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QGraphicsView, QGraphicsScene
+from PySide6.QtWidgets import QGraphicsRectItem
+from PySide6.QtCore import Qt, QRectF
+
+
+class GridScene(QGraphicsScene):
+  def __init__(self, parent=None, grid_size=25):
+    super().__init__(parent)
+    self.grid_size = grid_size
+
+  def drawBackground(self, painter: QPainter, rect: QRectF):
+    super().drawBackground(painter, rect)
+
+    pen = QPen(Qt.lightGray)
+    pen.setWidth(1)
+    painter.setPen(pen)
+
+    left = int(rect.left()) - (int(rect.left()) % self.grid_size)
+    top = int(rect.top()) - (int(rect.top()) % self.grid_size)
+
+    x = left
+    while x < rect.right():
+      painter.drawLine(x, rect.top(), x, rect.bottom())
+      x += self.grid_size
+
+    y = top
+    while y < rect.bottom():
+      painter.drawLine(rect.left(), y, rect.right(), y)
+      y += self.grid_size
+
 
 class LeftPanel(QWidget):
   def __init__(self, parent=None):
@@ -8,14 +36,36 @@ class LeftPanel(QWidget):
 
     layout = QVBoxLayout(self)
 
-    scene = QGraphicsScene(self)
-    view = QGraphicsView(scene)
+    self.scene = GridScene(self, grid_size=25)
+    self.view = QGraphicsView(self.scene)
 
-    pix = QPixmap("71.jpg")
-    p = QPixmap("188.jpg").scaled(200,200)
-    scene.addPixmap(pix)
-    scene.addPixmap(p)
+    pix = QPixmap("71.jpg").scaled(300, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+    p = QPixmap("188.jpg").scaled(200, 200, Qt.KeepAspectRatio, Qt.SmoothTransformation)
 
-    view.setRenderHint(QPainter.Antialiasing)
+    self.scene.addPixmap(pix)
+    self.scene.addPixmap(p)
 
-    layout.addWidget(view)
+    self.view.setRenderHint(QPainter.Antialiasing)
+    self.view.setRenderHint(QPainter.SmoothPixmapTransform)
+
+    layout.addWidget(self.view)
+
+    self._output_rect_item = None
+
+  def update_output_rect(self, w: int, h: int):
+    # центр именно текущего вида (то, что по центру экрана view)
+    center = self.view.mapToScene(self.view.viewport().rect().center())
+
+    rect = QRectF(center.x() - w / 2, center.y() - h / 2, w, h)
+
+    if self._output_rect_item is None:
+      self._output_rect_item = QGraphicsRectItem()
+      pen = QPen(Qt.red)
+      pen.setWidth(2)
+      self._output_rect_item.setPen(pen)
+      self._output_rect_item.setBrush(Qt.NoBrush)
+      self._output_rect_item.setZValue(10**9)  # чтобы было поверх картинок
+      self.scene.addItem(self._output_rect_item)
+
+    self._output_rect_item.setRect(rect)
+

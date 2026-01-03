@@ -46,6 +46,9 @@ class MainWindow(QMainWindow):
     self.ui = UI(self)
     self.right_panel.btn_load.clicked.connect(self.ui.load_project)
 
+    self.right_panel.sp_w.valueChanged.connect(self.ui.work_space)
+    self.right_panel.sp_h.valueChanged.connect(self.ui.work_space)
+
 if __name__ == "__main__":
   app = QApplication(sys.argv)
   window = MainWindow()
