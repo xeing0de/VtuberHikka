@@ -54,20 +54,24 @@ class LeftPanel(QWidget):
     layout.addWidget(self.view)
 
     self._output_rect_item = None
+    self._output_center = None
 
   def update_output_rect(self, w: int, h: int):
-    center = self.scene.sceneRect().center()
+    if self._output_center is None:
+        self._output_center = self.scene.sceneRect().center()
+    
+    center = self._output_center
 
     rect = QRectF(center.x() - w / 2, center.y() - h / 2, w, h)
 
     if self._output_rect_item is None:
-      self._output_rect_item = QGraphicsRectItem()
-      pen = QPen(Qt.red)
-      pen.setWidth(2)
-      self._output_rect_item.setPen(pen)
-      self._output_rect_item.setBrush(Qt.NoBrush)
-      self._output_rect_item.setZValue(10**9)
-      self.scene.addItem(self._output_rect_item)
+        self._output_rect_item = QGraphicsRectItem()
+        pen = QPen(Qt.red)
+        pen.setWidth(2)
+        self._output_rect_item.setPen(pen)
+        self._output_rect_item.setBrush(Qt.NoBrush)
+        self._output_rect_item.setZValue(10**9)
+        self.scene.addItem(self._output_rect_item)
 
     self._output_rect_item.setRect(rect)
 
