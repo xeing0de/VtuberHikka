@@ -78,3 +78,16 @@ class LeftPanel(QWidget):
 
             self._output_rect_item.setRect(rect)
 
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Delete:
+            self.delete_selected_items()
+        else:
+            super().keyPressEvent(event)
+
+    def delete_selected_items(self):
+        selected_items = self.scene.selectedItems()
+
+        for item in selected_items:
+            self.scene.removeItem(item)
+            self.project.items.remove(item)
+
