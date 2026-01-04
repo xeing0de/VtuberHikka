@@ -11,20 +11,20 @@ from PySide6.QtWidgets import (
 
 
 class RightPanel(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, project, parent=None):
         super().__init__(parent)
-        self.project = None
+        self.project = project
 
         layout = QVBoxLayout(self)
 
+        #buttons
         self.btn_load = QPushButton("Load Project")
-        layout.addWidget(self.btn_load)
-
         self.btn_save = QPushButton("Save Project")
-        layout.addWidget(self.btn_save)
+        self.btn_limage = QPushButton("Load Image")
 
-        form = QFormLayout()
-        layout.addLayout(form)
+        project_row = QHBoxLayout()
+        project_row.addWidget(self.btn_load)
+        project_row.addWidget(self.btn_save)
 
         self.sp_w = QSpinBox()
         self.sp_w.setRange(1, 20000)
@@ -40,7 +40,10 @@ class RightPanel(QWidget):
         row.addWidget(QLabel("Height"))
         row.addWidget(self.sp_h)
 
-        form.addRow(row)
+        layout.addLayout(project_row)
+        layout.addWidget(QLabel("Project name: " + self.project.name))
+        layout.addLayout(row)
+        layout.addWidget(self.btn_limage)
         layout.addStretch()
 
         self.btn_start = QPushButton("Start")

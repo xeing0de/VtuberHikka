@@ -32,7 +32,7 @@ class GridScene(QGraphicsScene):
 
 
 class LeftPanel(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, project, parent=None):
         super().__init__(parent)
 
         layout = QVBoxLayout(self)
@@ -45,7 +45,7 @@ class LeftPanel(QWidget):
 
         layout.addWidget(self.view)
 
-        self.project = None
+        self.project = project 
         self._output_rect_item = None
         self._output_center = QPointF(184, 256)
 

@@ -2,12 +2,31 @@ import os
 
 from PySide6.QtWidgets import QFileDialog, QMessageBox
 
-from objects import Project
+from objects import Project, ImageObject
 
 class UI:
     def __init__(self, window):
         self.window = window
     
+    def load_image(self):
+        file_path, _ = QFileDialog.getOpenFileName(
+            self.window,
+            "Load Image",
+            "",
+            "Images (*.png *.jpg *.jpeg *.bmp *.webp);;All Files (*.*)",
+        )
+        if not file_path:
+            return
+
+        try:
+            image = ImageObject(file_path)
+        except Exception as e:
+            QMessageBox.critical(self.window, "Load error", str(e))
+            return
+        
+        self.window.project.items.append(image)
+        self.window.left_panel.scene.addItem(image)
+
     def load_project(self):
         file_path, _ = QFileDialog.getOpenFileName(
             self.window,

@@ -31,14 +31,14 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.splitter)
 
         #panels
-        self.left_panel = LeftPanel()
-        self.right_panel = RightPanel()
+        self.left_panel = LeftPanel(self.project)
+        self.right_panel = RightPanel(self.project)
 
         self.splitter.addWidget(self.left_panel)
         self.splitter.addWidget(self.right_panel)
 
         w = self.width()
-        self.splitter.setSizes([int(w*0.55), int(w*0.45)])
+        self.splitter.setSizes([int(w*0.70), int(w*0.30)])
 
         #colors
         #self.left_panel.setStyleSheet("background-color: #2b2b2b;")
@@ -49,6 +49,7 @@ class MainWindow(QMainWindow):
 
         self.right_panel.btn_load.clicked.connect(self.ui.load_project)
         self.right_panel.btn_save.clicked.connect(self.ui.save_project)
+        self.right_panel.btn_limage.clicked.connect(self.ui.load_image)
 
         self.right_panel.sp_w.valueChanged.connect(self.ui.work_space)
         self.right_panel.sp_h.valueChanged.connect(self.ui.work_space)
