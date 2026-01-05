@@ -79,7 +79,7 @@ class LeftPanel(QWidget):
             self._output_rect_item.setZValue(10**9)
             self.scene.addItem(self._output_rect_item)
 
-            self._output_rect_item.setRect(rect)
+        self._output_rect_item.setRect(rect)
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Delete:
