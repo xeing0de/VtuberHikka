@@ -54,6 +54,9 @@ class MainWindow(QMainWindow):
         self.right_panel.sp_w.valueChanged.connect(self.ui.work_space)
         self.right_panel.sp_h.valueChanged.connect(self.ui.work_space)
 
+        #connections
+        self.left_panel.on_object_selected = self.right_panel.set_selected_object
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()

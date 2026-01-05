@@ -38,6 +38,8 @@ class LeftPanel(QWidget):
         layout = QVBoxLayout(self)
 
         self.scene = GridScene(self, grid_size=25)
+        self.scene.selectionChanged.connect(self._selection_changed)
+
         self.view = QGraphicsView(self.scene)
 
         self.view.setRenderHint(QPainter.Antialiasing)
@@ -48,6 +50,7 @@ class LeftPanel(QWidget):
         self.project = project 
         self._output_rect_item = None
         self._output_center = QPointF(184, 256)
+        self.on_object_selected = None
 
     def set_project(self, project):
         self.project = project
@@ -91,3 +94,9 @@ class LeftPanel(QWidget):
             self.scene.removeItem(item)
             self.project.items.remove(item)
 
+    def _selection_changed(self):
+        items = self.scene.selectedItems()
+        selected = items[0] if items else None
+
+        if self.on_object_selected is not None:
+            self.on_object_selected(selected)

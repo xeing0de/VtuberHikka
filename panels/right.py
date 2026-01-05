@@ -15,6 +15,7 @@ class RightPanel(QWidget):
     def __init__(self, project, parent=None):
         super().__init__(parent)
         self.project = project
+        self.selected_object = None
 
         layout = QVBoxLayout(self)
 
@@ -72,12 +73,30 @@ class RightPanel(QWidget):
         gb_toolbar_layout.addWidget(self.btn_limage)
         gb_toolbar_layout.addWidget(self.btn_text)
 
+        #object_properties
+        gb_object = QGroupBox("Object")
+        gb_object_layout = QHBoxLayout(gb_object)
+        gb_object_layout.setContentsMargins(8, 10, 8, 8)
+        gb_object_layout.setSpacing(6)
+        
+        self.obj_name = QLabel("Nothing Selected")
+        gb_object_layout.addWidget(self.obj_name)
 
         #compose
         layout.addWidget(gb_project)
         layout.addWidget(gb_workspace)
         layout.addWidget(gb_toolbar)
+        layout.addWidget(gb_object)
 
         layout.addStretch()
 
         layout.addWidget(self.btn_start)
+
+    def set_selected_object(self, obj):
+        self.selected_object = obj
+
+        if obj is None:
+            self.obj_name.setText("Nothing Selected")
+        else:
+            self.obj_name.setText(obj.name)
+

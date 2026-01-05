@@ -3,9 +3,10 @@ from PySide6.QtGui import QPainter, QPixmap, QPen, QColor
 from PySide6.QtWidgets import QGraphicsObject, QGraphicsItem
 
 class ImageObject(QGraphicsObject):
-    def __init__(self, path, parent=None):
+    def __init__(self, path, name = "Image1", parent=None):
         super().__init__(parent)
         self.image_path = path
+        self.name = name
         self._pixmap = QPixmap(path) 
 
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
@@ -30,6 +31,7 @@ class ImageObject(QGraphicsObject):
         pos = self.pos()
         return {
           "type": "image",
+          "name": self.name,
           "path": self.image_path,
           "x": float(pos.x()),
           "y": float(pos.y()),
@@ -42,7 +44,7 @@ class ImageObject(QGraphicsObject):
 
     @staticmethod
     def from_dict(data):
-        item = ImageObject(data["path"])
+        item = ImageObject(data["path"], data["name"])
         item.setPos(data.get("x", 0.0), data.get("y", 0.0))
         item.setScale(data.get("scale", 1.0))
         item.setRotation(data.get("rotation", 0.0))
