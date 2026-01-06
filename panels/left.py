@@ -51,6 +51,7 @@ class LeftPanel(QWidget):
         self._output_rect_item = None
         self._output_center = QPointF(184, 256)
         self.on_object_selected = None
+        self.on_set_project = None
 
     def set_project(self, project):
         self.project = project
@@ -64,6 +65,7 @@ class LeftPanel(QWidget):
             self.scene.addItem(item)
 
         self.update_output_rect(project.output_width, project.output_height)
+        self.on_set_project(self.project)
 
     def update_output_rect(self, w, h):
         center = self._output_center

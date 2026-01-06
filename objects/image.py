@@ -6,6 +6,7 @@ class ImageObject(QGraphicsObject):
     def __init__(self, path, name = "Image1", parent=None):
         super().__init__(parent)
         self.image_path = path
+        self.type = "Image"
         self.name = name
         self._pixmap = QPixmap(path) 
 
@@ -30,7 +31,7 @@ class ImageObject(QGraphicsObject):
     def to_dict(self):
         pos = self.pos()
         return {
-          "type": "image",
+          "type": self.type,
           "name": self.name,
           "path": self.image_path,
           "x": float(pos.x()),

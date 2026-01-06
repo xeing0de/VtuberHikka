@@ -38,7 +38,8 @@ class MainWindow(QMainWindow):
         self.splitter.addWidget(self.right_panel)
 
         w = self.width()
-        self.splitter.setSizes([int(w*0.70), int(w*0.30)])
+        self.right_panel.setMinimumWidth(1)
+        self.splitter.setSizes([int(w * 0.8), int(w * 0.2)])
 
         #colors
         #self.left_panel.setStyleSheet("background-color: #2b2b2b;")
@@ -56,6 +57,8 @@ class MainWindow(QMainWindow):
 
         #connections
         self.left_panel.on_object_selected = self.right_panel.set_selected_object
+        self.left_panel.on_set_project = self.right_panel.set_project
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

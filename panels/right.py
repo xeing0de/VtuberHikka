@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (
         QGroupBox,
         )
 
+from .properties import ImageProp
 
 class RightPanel(QWidget):
     def __init__(self, project, parent=None):
@@ -28,7 +29,7 @@ class RightPanel(QWidget):
         #spinboxes
         self.sp_w = QSpinBox()
         self.sp_w.setRange(1, 20000)
-        self.sp_w.setValue(500)
+        self.sp_w.setValue(800)
 
         self.sp_h = QSpinBox()
         self.sp_h.setRange(1, 20000)
@@ -74,12 +75,14 @@ class RightPanel(QWidget):
 
         #object_properties
         gb_object = QGroupBox("Object")
-        gb_object_layout = QHBoxLayout(gb_object)
+        gb_object_layout = QVBoxLayout(gb_object)
         gb_object_layout.setContentsMargins(8, 10, 8, 8)
         gb_object_layout.setSpacing(6)
         
         self.obj_name = QLabel("Nothing Selected")
         gb_object_layout.addWidget(self.obj_name)
+        self.prop = ImageProp(self.selected_object)
+        gb_object_layout.addWidget(self.prop)
 
         #compose
         layout.addWidget(gb_project)
@@ -97,5 +100,15 @@ class RightPanel(QWidget):
         if obj is None:
             self.obj_name.setText("Nothing Selected")
         else:
-            self.obj_name.setText(obj.name)
+            self.obj_name.setText(obj.type)
+
+    def set_project(self, project):
+        self.project = project
+        self.lbl_project_name.setText(f"Project name: {self.project.name}")
+        self.sp_w.setValue(self.project.output_width)
+        self.sp_h.setValue(self.project.output_height)
+
+
+
+
 
