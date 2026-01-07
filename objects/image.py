@@ -2,8 +2,7 @@ from PySide6.QtCore import QRectF, Qt
 from PySide6.QtGui import QPainter, QPixmap, QPen, QColor
 from PySide6.QtWidgets import QGraphicsItem
 
-from baseobject import BaseObject
-
+from .baseobject import BaseObject
 
 class ImageObject(BaseObject):
     TYPE = "Image"

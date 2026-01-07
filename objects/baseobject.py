@@ -1,10 +1,10 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from PySide6.QtCore import QRectF, Qt
 from PySide6.QtGui import QPainter, QPen, QColor
 from PySide6.QtWidgets import QGraphicsObject, QGraphicsItem
 
 
-class BaseObject(ABC, QGraphicsObject):
+class BaseObject(QGraphicsObject):
     TYPE = "Base"
     def __init__(self, name: str = "Object", parent=None):
         super().__init__(parent)
