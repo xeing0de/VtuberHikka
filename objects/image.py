@@ -1,17 +1,18 @@
 from PySide6.QtCore import QRectF, Qt
 from PySide6.QtGui import QPainter, QPixmap, QPen, QColor
-from PySide6.QtWidgets import QGraphicsObject, QGraphicsItem
+from PySide6.QtWidgets import QGraphicsItem
 
-class ImageObject(QGraphicsObject):
-    def __init__(self, path, name = "Image1", parent=None):
-        super().__init__(parent)
+from baseobject import BaseObject
+
+
+class ImageObject(BaseObject):
+    TYPE = "Image"
+
+    def __init__(self, path: str = "", name: str = "Image1", parent=None):
+        super().__init__(name=name, parent=parent)
+
         self.image_path = path
-        self.type = "Image"
-        self.name = name
-        self._pixmap = QPixmap(path) 
-
-        self.setFlag(QGraphicsItem.ItemIsSelectable, True)
-        self.setFlag(QGraphicsItem.ItemIsMovable, True)
+        self._pixmap = QPixmap(path)
 
     def boundingRect(self):
         return QRectF(self._pixmap.rect())
@@ -20,36 +21,15 @@ class ImageObject(QGraphicsObject):
         painter.drawPixmap(0, 0, self._pixmap)
 
         if self.isSelected():
-            pen = QPen(QColor(100, 100, 255))
-            pen.setWidthF(1.5)
-            pen.setCosmetic(True)
-            painter.setPen(pen)
-            painter.setBrush(Qt.NoBrush)
+            self._paint_selection(painter)
 
-            painter.drawRect(self._pixmap.rect())
-    
-    def to_dict(self):
-        pos = self.pos()
+    def _specific_to_dict(self):
         return {
-          "type": self.type,
-          "name": self.name,
-          "path": self.image_path,
-          "x": float(pos.x()),
-          "y": float(pos.y()),
-          "scale": float(self.scale()),
-          "rotation": float(self.rotation()),
-          "z": float(self.zValue()),
-          "opacity": float(self.opacity()),
-          "visible": bool(self.isVisible()),
+            "path": self.image_path,
         }
 
-    @staticmethod
-    def from_dict(data):
-        item = ImageObject(data["path"], data["name"])
-        item.setPos(data.get("x", 0.0), data.get("y", 0.0))
-        item.setScale(data.get("scale", 1.0))
-        item.setRotation(data.get("rotation", 0.0))
-        item.setZValue(data.get("z", 0.0))
-        item.setOpacity(data.get("opacity", 1.0))
-        item.setVisible(data.get("visible", True))
-        return item
+    def _specific_from_dict(self, data: dict):
+        path = data["path"]
+        self.image_path = path
+        self._pixmap = QPixmap(path)
+
