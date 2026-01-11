@@ -51,6 +51,7 @@ class MainWindow(QMainWindow):
         self.right_panel.btn_load.clicked.connect(self.ui.load_project)
         self.right_panel.btn_save.clicked.connect(self.ui.save_project)
         self.right_panel.btn_limage.clicked.connect(self.ui.load_image)
+        self.right_panel.btn_text.clicked.connect(self.ui.create_text)
 
         self.right_panel.sp_w.valueChanged.connect(self.ui.work_space)
         self.right_panel.sp_h.valueChanged.connect(self.ui.work_space)

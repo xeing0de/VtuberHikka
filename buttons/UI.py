@@ -2,12 +2,20 @@ import os
 
 from PySide6.QtWidgets import QFileDialog, QMessageBox
 
-from objects import Project, ImageObject
+from objects import Project, ImageObject, TextObject
 
 class UI:
     def __init__(self, window):
         self.window = window
-    
+
+    def create_text(self):
+        project = self.window.project
+
+        obj = TextObject()
+
+        project.items.append(obj)
+        self.window.left_panel.scene.addItem(obj)
+
     def load_image(self):
         file_path, _ = QFileDialog.getOpenFileName(
             self.window,

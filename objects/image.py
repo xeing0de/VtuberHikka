@@ -17,6 +17,7 @@ class ImageObject(BaseObject):
         return QRectF(self._pixmap.rect())
 
     def paint(self, painter: QPainter, option, widget=None):
+        painter.setRenderHint(QPainter.SmoothPixmapTransform, True)
         painter.drawPixmap(0, 0, self._pixmap)
 
         if self.isSelected():
