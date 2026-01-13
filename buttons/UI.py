@@ -2,7 +2,7 @@ import os
 
 from PySide6.QtWidgets import QFileDialog, QMessageBox
 
-from objects import Project, ImageObject, TextObject
+from objects import Project, ImageObject, TextObject, AnimationObject
 
 class UI:
     def __init__(self, window):
@@ -12,6 +12,15 @@ class UI:
         project = self.window.project
 
         obj = TextObject()
+
+        project.add_item(obj)
+        self.window.left_panel.scene.addItem(obj)
+        self.window.left_panel.on_items_changed()
+
+    def create_animation(self):
+        project = self.window.project
+
+        obj = AnimationObject()
 
         project.add_item(obj)
         self.window.left_panel.scene.addItem(obj)

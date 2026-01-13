@@ -32,6 +32,7 @@ class RightPanel(QWidget):
         self.btn_limage = QPushButton("Load Image")
         self.btn_text = QPushButton("Add Text")
         self.btn_start = QPushButton("Start")
+        self.btn_animation = QPushButton("Create Animation")
 
         # spinboxes
         self.sp_w = QSpinBox()
@@ -98,6 +99,7 @@ class RightPanel(QWidget):
 
         gb_toolbar_layout.addWidget(self.btn_limage)
         gb_toolbar_layout.addWidget(self.btn_text)
+        gb_toolbar_layout.addWidget(self.btn_animation)
 
         # object properties
         gb_object = QGroupBox("Object")
