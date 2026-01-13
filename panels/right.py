@@ -20,6 +20,8 @@ class RightPanel(QWidget):
         self.project = project
         self.scene = scene
         self.selected_object = None
+        self._uid_to_obj = {o.uid: o for o in self.project.items}
+
 
         layout = QVBoxLayout(self)
 
@@ -74,10 +76,16 @@ class RightPanel(QWidget):
         gb_layers_layout.setContentsMargins(8, 10, 8, 8)
         gb_layers_layout.setSpacing(6)
 
-        self.layers_list = QListWidget()
+        self.layers_list = LayersList()
+        self.layers_list.on_reorder = self._on_layers_reordered
         self.layers_list.setSelectionMode(QListWidget.SingleSelection)
         self.layers_list.itemSelectionChanged.connect(self._on_layer_selection_changed)
         gb_layers_layout.addWidget(self.layers_list)
+        self.layers_list.setDragEnabled(True)
+        self.layers_list.setAcceptDrops(True)
+        self.layers_list.setDropIndicatorShown(True)
+        self.layers_list.setDefaultDropAction(Qt.MoveAction)
+        self.layers_list.setDragDropMode(QListWidget.InternalMove)
 
         #toolbar
         gb_toolbar = QGroupBox("Toolbar")
@@ -137,24 +145,27 @@ class RightPanel(QWidget):
             text = f"{z:g}. {name}"
 
             it = QListWidgetItem(text)
-            it.setData(Qt.UserRole, obj)
+            it.setData(Qt.UserRole, obj.uid)
             self.layers_list.addItem(it)
 
         if self.selected_object is not None:
             self._select_object_in_layers(self.selected_object)
 
         self.layers_list.blockSignals(False)
+        self._uid_to_obj = {o.uid: o for o in self.project.items}
 
     def _select_object_in_layers(self, obj):
         for i in range(self.layers_list.count()):
             it = self.layers_list.item(i)
-            if it.data(Qt.UserRole) is obj:
+            if it.data(Qt.UserRole) == obj.uid:
                 self.layers_list.setCurrentRow(i)
                 return
 
     def _on_layer_selection_changed(self):
         it = self.layers_list.currentItem()
-        obj = it.data(Qt.UserRole) if it else None
+        uid = it.data(Qt.UserRole) if it else None
+        obj = self._uid_to_obj.get(uid) if uid else None
+
 
         self.set_selected_object(obj)
 
@@ -164,7 +175,28 @@ class RightPanel(QWidget):
             obj.setSelected(True)
             self.scene.blockSignals(False)
 
+    def _on_layers_reordered(self):
+        count = self.layers_list.count()
+
+        for i in range(count):
+            item = self.layers_list.item(i)
+            uid = item.data(Qt.UserRole)
+            obj = self._uid_to_obj.get(uid)
+
+            new_z = count - 1 - i
+            obj.setZValue(new_z)
+
+        self.project.items.sort(key=lambda o: o.zValue())
+        self.refresh_layers()
 
 
+class LayersList(QListWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.on_reorder = None
+
+    def dropEvent(self, event):
+        super().dropEvent(event)
+        self.on_reorder()
 
 

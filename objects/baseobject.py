@@ -1,3 +1,5 @@
+import uuid
+
 from abc import abstractmethod
 from PySide6.QtCore import QRectF, Qt
 from PySide6.QtGui import QPainter, QPen, QColor
@@ -11,6 +13,7 @@ class BaseObject(QGraphicsObject):
 
         self.type = self.TYPE
         self.name = name
+        self.uid = uuid.uuid4().hex
 
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
@@ -50,6 +53,7 @@ class BaseObject(QGraphicsObject):
         data = {
             "type": self.type,
             "name": self.name,
+            "uid": self.uid,
 
             "x": float(pos.x()),
             "y": float(pos.y()),
@@ -65,6 +69,7 @@ class BaseObject(QGraphicsObject):
     def from_dict(self, data: dict):
         self.name = data.get("name", self.name)
         self.type = data.get("type", self.type)
+        self.uid = data.get("uid", getattr(self, "uid", None) or uuid.uuid4().hex)
 
         self.setPos(data.get("x", 0.0), data.get("y", 0.0))
         self.setScale(data.get("scale", 1.0))
