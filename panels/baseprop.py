@@ -17,9 +17,9 @@ class BaseProp(QWidget):
         self._updating = False
         self.panel = panel
 
-        main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(0, 0, 0, 0)
-        main_layout.setSpacing(6)
+        self.main_layout = QVBoxLayout(self)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_layout.setSpacing(6)
 
         form = QFormLayout()
         form.setLabelAlignment(Qt.AlignLeft)
@@ -60,10 +60,10 @@ class BaseProp(QWidget):
         self.sp_opacity.setDecimals(2)
         form.addRow("Opacity", self.sp_opacity)
 
-        main_layout.addLayout(form)
+        self.main_layout.addLayout(form)
 
         self._connect_signals()
-        self.set_object(obj)
+        self.setEnabled(False)
 
     def _connect_signals(self):
         self.ed_name.editingFinished.connect(self._on_name_changed)

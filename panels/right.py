@@ -9,9 +9,11 @@ from PySide6.QtWidgets import (
     QGroupBox,
     QListWidget,
     QListWidgetItem,
+    QStackedWidget,
 )
 
-from .properties import BaseProp
+from .imageprop import ImageProp
+from .textprop import TextProp
 
 
 class RightPanel(QWidget):
@@ -106,8 +108,22 @@ class RightPanel(QWidget):
         self.obj_name = QLabel("Nothing Selected")
         gb_object_layout.addWidget(self.obj_name)
 
-        self.prop = BaseProp(self, self.selected_object)
-        gb_object_layout.addWidget(self.prop)
+        self.props_stack = QStackedWidget()
+        gb_object_layout.addWidget(self.props_stack)
+
+        self.empty_prop = QLabel("No properties")
+        self.empty_prop.setAlignment(Qt.AlignCenter)
+        self.props_stack.addWidget(self.empty_prop)
+
+        self.prop_dict = {
+            "Image": ImageProp(self, None),
+            "Text": TextProp(self, None),
+        }
+
+        for w in self.prop_dict.values():
+            self.props_stack.addWidget(w)
+
+        self.props_stack.setCurrentWidget(self.empty_prop)
 
         # compose
         layout.addWidget(gb_project)
@@ -124,10 +140,18 @@ class RightPanel(QWidget):
 
         if obj is None:
             self.obj_name.setText("Nothing Selected")
-        else:
-            self.obj_name.setText(obj.type)
+            self.props_stack.setCurrentWidget(self.empty_prop)
+            return
 
-        self.prop.set_object(obj)
+        self.obj_name.setText(obj.type)
+
+        prop = self.prop_dict.get(obj.type)
+        if prop is None:
+            self.props_stack.setCurrentWidget(self.empty_prop)
+            return
+
+        self.props_stack.setCurrentWidget(prop)
+        prop.set_object(obj)
 
     def set_project(self, project):
         self.project = project
@@ -178,7 +202,9 @@ class RightPanel(QWidget):
         obj.setVisible(visible)
 
         if obj is self.selected_object:
-            self.prop.pull_from_object()
+            w = self.props_stack.currentWidget()
+            if hasattr(w, "pull_from_object"):
+                w.pull_from_object()
 
 
     def _on_layer_selection_changed(self):

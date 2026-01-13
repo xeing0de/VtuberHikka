@@ -8,6 +8,7 @@ from PySide6.QtGui import (
     QTextCursor,
     QTextDocument,
     QPainterPath,
+    QFontMetricsF,
 )
 from PySide6.QtWidgets import QGraphicsItem
 
@@ -40,6 +41,7 @@ class TextObject(BaseObject):
         self.outline_width = 2.0
 
         self._doc = QTextDocument()
+        self._bbox = QRectF(0.0, 0.0, 0.0, 0.0)
         self._update_document()
 
     def _make_font(self):
@@ -56,6 +58,31 @@ class TextObject(BaseObject):
         fmt.setForeground(self.color)
         cursor.mergeCharFormat(fmt)
 
+    def _get_lines(self):
+        lines = self.text.split("\n")
+        if self.text.endswith("\n"):
+            lines.append("")
+        if not lines:
+            lines = [""]
+        return lines
+
+    def _recalc_bbox(self):
+        font = self._make_font()
+        fm = QFontMetricsF(font)
+
+        lines = self._get_lines()
+
+        max_w = 0.0
+        for s in lines:
+            w = float(fm.horizontalAdvance(s))
+            if w > max_w:
+                max_w = w
+
+        h = float(len(lines)) * float(fm.lineSpacing())
+
+        pad = float(self.outline_width) if self.outline_enabled else 0.0
+        self._bbox = QRectF(0.0, 0.0, max_w + pad, h + pad)
+
     def _update_document(self):
         self._doc.setDocumentMargin(0)
         self._doc.setDefaultFont(self._make_font())
@@ -66,11 +93,11 @@ class TextObject(BaseObject):
         self._apply_text_color()
 
         self.prepareGeometryChange()
+        self._recalc_bbox()
         self.update()
 
     def boundingRect(self) -> QRectF:
-        size = self._doc.documentLayout().documentSize()
-        return QRectF(0.0, 0.0, float(size.width()), float(size.height()))
+        return QRectF(self._bbox)
 
     def paint(self, painter: QPainter, option, widget=None):
         painter.save()
@@ -79,20 +106,18 @@ class TextObject(BaseObject):
 
         font = self._make_font()
         painter.setFont(font)
+        fm = QFontMetricsF(font)
 
         path = QPainterPath()
 
-        block = self._doc.firstBlock()
-        while block.isValid():
-            layout = block.layout()
-            line = layout.lineAt(0)
+        lines = self._get_lines()
+        line_h = float(fm.lineSpacing())
+        ascent = float(fm.ascent())
 
-            x = line.position().x()
-            y = line.position().y() + line.ascent()
-
-            path.addText(x, y, font, block.text())
-
-            block = block.next()
+        y = ascent
+        for s in lines:
+            path.addText(0.0, y, font, s)
+            y += line_h
 
         if self.outline_enabled:
             pen = QPen(self.outline_color)
