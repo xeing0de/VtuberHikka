@@ -1,3 +1,4 @@
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
         QWidget, 
         QHBoxLayout, 
@@ -7,14 +8,17 @@ from PySide6.QtWidgets import (
         QSpinBox, 
         QFormLayout,
         QGroupBox,
+        QListWidget,
+        QListWidgetItem,
         )
 
 from .properties import ImageProp
 
 class RightPanel(QWidget):
-    def __init__(self, project, parent=None):
+    def __init__(self, project, scene = None, parent=None):
         super().__init__(parent)
         self.project = project
+        self.scene = scene
         self.selected_object = None
 
         layout = QVBoxLayout(self)
@@ -64,6 +68,17 @@ class RightPanel(QWidget):
 
         gb_workspace_layout.addLayout(workspace_row)
 
+        #Layers
+        gb_layers = QGroupBox("Layers")
+        gb_layers_layout = QVBoxLayout(gb_layers)
+        gb_layers_layout.setContentsMargins(8, 10, 8, 8)
+        gb_layers_layout.setSpacing(6)
+
+        self.layers_list = QListWidget()
+        self.layers_list.setSelectionMode(QListWidget.SingleSelection)
+        self.layers_list.itemSelectionChanged.connect(self._on_layer_selection_changed)
+        gb_layers_layout.addWidget(self.layers_list)
+
         #toolbar
         gb_toolbar = QGroupBox("Toolbar")
         gb_toolbar_layout = QHBoxLayout(gb_toolbar)
@@ -88,6 +103,7 @@ class RightPanel(QWidget):
         layout.addWidget(gb_project)
         layout.addWidget(gb_workspace)
         layout.addWidget(gb_toolbar)
+        layout.addWidget(gb_layers)
         layout.addWidget(gb_object)
 
         layout.addStretch()
@@ -107,6 +123,46 @@ class RightPanel(QWidget):
         self.lbl_project_name.setText(f"Project name: {self.project.name}")
         self.sp_w.setValue(self.project.output_width)
         self.sp_h.setValue(self.project.output_height)
+
+    def refresh_layers(self):
+        self.layers_list.blockSignals(True)
+        self.layers_list.clear()
+
+        items = self.project.items
+        items.sort(key=lambda obj: obj._get_obj_z(), reverse=True)
+
+        for obj in items:
+            z = obj._get_obj_z()
+            name = obj.name
+            text = f"{z:g}. {name}"
+
+            it = QListWidgetItem(text)
+            it.setData(Qt.UserRole, obj)
+            self.layers_list.addItem(it)
+
+        if self.selected_object is not None:
+            self._select_object_in_layers(self.selected_object)
+
+        self.layers_list.blockSignals(False)
+
+    def _select_object_in_layers(self, obj):
+        for i in range(self.layers_list.count()):
+            it = self.layers_list.item(i)
+            if it.data(Qt.UserRole) is obj:
+                self.layers_list.setCurrentRow(i)
+                return
+
+    def _on_layer_selection_changed(self):
+        it = self.layers_list.currentItem()
+        obj = it.data(Qt.UserRole) if it else None
+
+        self.set_selected_object(obj)
+
+        if obj is not None and self.scene is not None:
+            self.scene.blockSignals(True)
+            self.scene.clearSelection()
+            obj.setSelected(True)
+            self.scene.blockSignals(False)
 
 
 

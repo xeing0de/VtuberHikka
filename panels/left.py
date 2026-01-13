@@ -52,6 +52,7 @@ class LeftPanel(QWidget):
         self._output_center = QPointF(184, 256)
         self.on_object_selected = None
         self.on_set_project = None
+        self.on_items_changed = None
 
     def set_project(self, project):
         self.project = project
@@ -66,6 +67,7 @@ class LeftPanel(QWidget):
 
         self.update_output_rect(project.output_width, project.output_height)
         self.on_set_project(self.project)
+        self.on_items_changed()
 
     def update_output_rect(self, w, h):
         center = self._output_center
@@ -94,7 +96,9 @@ class LeftPanel(QWidget):
 
         for item in selected_items:
             self.scene.removeItem(item)
-            self.project.items.remove(item)
+            self.project.delete_item(item)
+
+        self.on_items_changed()
 
     def _selection_changed(self):
         items = self.scene.selectedItems()
@@ -102,3 +106,5 @@ class LeftPanel(QWidget):
 
         if self.on_object_selected is not None:
             self.on_object_selected(selected)
+        
+        self.on_items_changed()

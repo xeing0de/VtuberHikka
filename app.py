@@ -32,7 +32,7 @@ class MainWindow(QMainWindow):
 
         #panels
         self.left_panel = LeftPanel(self.project)
-        self.right_panel = RightPanel(self.project)
+        self.right_panel = RightPanel(self.project, scene=self.left_panel.scene)
 
         self.splitter.addWidget(self.left_panel)
         self.splitter.addWidget(self.right_panel)
@@ -59,6 +59,7 @@ class MainWindow(QMainWindow):
         #connections
         self.left_panel.on_object_selected = self.right_panel.set_selected_object
         self.left_panel.on_set_project = self.right_panel.set_project
+        self.left_panel.on_items_changed = self.right_panel.refresh_layers
 
 
 if __name__ == "__main__":

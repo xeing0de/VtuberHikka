@@ -42,6 +42,9 @@ class BaseObject(QGraphicsObject):
         painter.setBrush(Qt.NoBrush)
         painter.drawRect(self.boundingRect())
 
+    def _get_obj_z(self):
+        return self.zValue()
+
     def to_dict(self):
         pos = self.pos()
         data = {

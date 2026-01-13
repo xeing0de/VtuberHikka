@@ -13,8 +13,9 @@ class UI:
 
         obj = TextObject()
 
-        project.items.append(obj)
+        project.add_item(obj)
         self.window.left_panel.scene.addItem(obj)
+        self.window.left_panel.on_items_changed()
 
     def load_image(self):
         file_path, _ = QFileDialog.getOpenFileName(
@@ -32,8 +33,9 @@ class UI:
             QMessageBox.critical(self.window, "Load error", str(e))
             return
         
-        self.window.project.items.append(image)
+        self.window.project.add_item(image)
         self.window.left_panel.scene.addItem(image)
+        self.window.left_panel.on_items_changed()
 
     def load_project(self):
         file_path, _ = QFileDialog.getOpenFileName(
