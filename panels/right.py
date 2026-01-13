@@ -14,7 +14,7 @@ from PySide6.QtWidgets import (
 
 from .imageprop import ImageProp
 from .textprop import TextProp
-
+from .animationprop import AnimationProp
 
 class RightPanel(QWidget):
     def __init__(self, project, scene=None, parent=None):
@@ -120,6 +120,7 @@ class RightPanel(QWidget):
         self.prop_dict = {
             "Image": ImageProp(self, None),
             "Text": TextProp(self, None),
+            "Animation": AnimationProp(self, None),
         }
 
         for w in self.prop_dict.values():
