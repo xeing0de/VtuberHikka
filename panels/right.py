@@ -1,38 +1,37 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
-        QWidget, 
-        QHBoxLayout, 
-        QVBoxLayout, 
-        QPushButton, 
-        QLabel, 
-        QSpinBox, 
-        QFormLayout,
-        QGroupBox,
-        QListWidget,
-        QListWidgetItem,
-        )
+    QWidget,
+    QHBoxLayout,
+    QVBoxLayout,
+    QPushButton,
+    QLabel,
+    QSpinBox,
+    QGroupBox,
+    QListWidget,
+    QListWidgetItem,
+)
 
-from .properties import ImageProp
+from .properties import BaseProp
+
 
 class RightPanel(QWidget):
-    def __init__(self, project, scene = None, parent=None):
+    def __init__(self, project, scene=None, parent=None):
         super().__init__(parent)
         self.project = project
         self.scene = scene
         self.selected_object = None
         self._uid_to_obj = {o.uid: o for o in self.project.items}
 
-
         layout = QVBoxLayout(self)
 
-        #buttons
+        # buttons
         self.btn_load = QPushButton("Load Project")
         self.btn_save = QPushButton("Save Project")
         self.btn_limage = QPushButton("Load Image")
         self.btn_text = QPushButton("Add Text")
         self.btn_start = QPushButton("Start")
 
-        #spinboxes
+        # spinboxes
         self.sp_w = QSpinBox()
         self.sp_w.setRange(1, 20000)
         self.sp_w.setValue(800)
@@ -41,7 +40,7 @@ class RightPanel(QWidget):
         self.sp_h.setRange(1, 20000)
         self.sp_h.setValue(500)
 
-        #project
+        # project
         gb_project = QGroupBox("Project")
         gb_project_layout = QVBoxLayout(gb_project)
         gb_project_layout.setContentsMargins(8, 10, 8, 8)
@@ -56,12 +55,12 @@ class RightPanel(QWidget):
         gb_project_layout.addLayout(project_row)
         gb_project_layout.addWidget(self.lbl_project_name)
 
-        #workspace
+        # workspace
         gb_workspace = QGroupBox("Workspace")
         gb_workspace_layout = QVBoxLayout(gb_workspace)
         gb_workspace_layout.setContentsMargins(8, 10, 8, 8)
         gb_workspace_layout.setSpacing(6)
-        
+
         workspace_row = QHBoxLayout()
         workspace_row.addWidget(QLabel("Width"))
         workspace_row.addWidget(self.sp_w)
@@ -70,7 +69,7 @@ class RightPanel(QWidget):
 
         gb_workspace_layout.addLayout(workspace_row)
 
-        #Layers
+        # layers
         gb_layers = QGroupBox("Layers")
         gb_layers_layout = QVBoxLayout(gb_layers)
         gb_layers_layout.setContentsMargins(8, 10, 8, 8)
@@ -80,14 +79,16 @@ class RightPanel(QWidget):
         self.layers_list.on_reorder = self._on_layers_reordered
         self.layers_list.setSelectionMode(QListWidget.SingleSelection)
         self.layers_list.itemSelectionChanged.connect(self._on_layer_selection_changed)
+        self.layers_list.itemChanged.connect(self._on_layer_item_changed)
         gb_layers_layout.addWidget(self.layers_list)
+
         self.layers_list.setDragEnabled(True)
         self.layers_list.setAcceptDrops(True)
         self.layers_list.setDropIndicatorShown(True)
         self.layers_list.setDefaultDropAction(Qt.MoveAction)
         self.layers_list.setDragDropMode(QListWidget.InternalMove)
 
-        #toolbar
+        # toolbar
         gb_toolbar = QGroupBox("Toolbar")
         gb_toolbar_layout = QHBoxLayout(gb_toolbar)
         gb_toolbar_layout.setContentsMargins(8, 10, 8, 8)
@@ -96,18 +97,19 @@ class RightPanel(QWidget):
         gb_toolbar_layout.addWidget(self.btn_limage)
         gb_toolbar_layout.addWidget(self.btn_text)
 
-        #object_properties
+        # object properties
         gb_object = QGroupBox("Object")
         gb_object_layout = QVBoxLayout(gb_object)
         gb_object_layout.setContentsMargins(8, 10, 8, 8)
         gb_object_layout.setSpacing(6)
-        
+
         self.obj_name = QLabel("Nothing Selected")
         gb_object_layout.addWidget(self.obj_name)
-        self.prop = ImageProp(self.selected_object)
+
+        self.prop = BaseProp(self, self.selected_object)
         gb_object_layout.addWidget(self.prop)
 
-        #compose
+        # compose
         layout.addWidget(gb_project)
         layout.addWidget(gb_workspace)
         layout.addWidget(gb_toolbar)
@@ -115,7 +117,6 @@ class RightPanel(QWidget):
         layout.addWidget(gb_object)
 
         layout.addStretch()
-
         layout.addWidget(self.btn_start)
 
     def set_selected_object(self, obj):
@@ -125,6 +126,8 @@ class RightPanel(QWidget):
             self.obj_name.setText("Nothing Selected")
         else:
             self.obj_name.setText(obj.type)
+
+        self.prop.set_object(obj)
 
     def set_project(self, project):
         self.project = project
@@ -146,6 +149,10 @@ class RightPanel(QWidget):
 
             it = QListWidgetItem(text)
             it.setData(Qt.UserRole, obj.uid)
+
+            it.setFlags(it.flags() | Qt.ItemIsUserCheckable)
+            it.setCheckState(Qt.Checked if obj.isVisible() else Qt.Unchecked)
+
             self.layers_list.addItem(it)
 
         if self.selected_object is not None:
@@ -161,11 +168,23 @@ class RightPanel(QWidget):
                 self.layers_list.setCurrentRow(i)
                 return
 
+    def _on_layer_item_changed(self, item):
+        uid = item.data(Qt.UserRole)
+        obj = self._uid_to_obj.get(uid) if uid else None
+        if obj is None:
+            return
+
+        visible = item.checkState() == Qt.Checked
+        obj.setVisible(visible)
+
+        if obj is self.selected_object:
+            self.prop.pull_from_object()
+
+
     def _on_layer_selection_changed(self):
         it = self.layers_list.currentItem()
         uid = it.data(Qt.UserRole) if it else None
         obj = self._uid_to_obj.get(uid) if uid else None
-
 
         self.set_selected_object(obj)
 
@@ -197,6 +216,6 @@ class LayersList(QListWidget):
 
     def dropEvent(self, event):
         super().dropEvent(event)
-        self.on_reorder()
-
+        if self.on_reorder is not None:
+            self.on_reorder()
 
