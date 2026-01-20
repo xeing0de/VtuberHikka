@@ -8,6 +8,15 @@ class UI:
     def __init__(self, window):
         self.window = window
 
+    def create_text_anim(self):
+        anim_obj = self.window.anim_editor.obj
+
+        obj = TextObject()
+
+        anim_obj.add_item(obj)
+        self.window.anim_editor.left_panel.scene.addItem(obj)
+        self.window.anim_editor.left_panel.on_items_changed()
+
     def create_text(self):
         project = self.window.project
 

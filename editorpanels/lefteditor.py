@@ -1,0 +1,113 @@
+from PySide6.QtGui import QPixmap, QPainter, QPen, QColor
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QGraphicsView, QGraphicsScene
+from PySide6.QtWidgets import QGraphicsRectItem
+from PySide6.QtCore import Qt, QRectF, QPointF
+from objects import ImageObject, Project
+
+
+class GridScene(QGraphicsScene):
+    def __init__(self, parent=None, grid_size=25):
+        super().__init__(parent)
+        self.grid_size = grid_size
+
+    def drawBackground(self, painter: QPainter, rect: QRectF):
+        super().drawBackground(painter, rect)
+
+        pen = QPen(QColor(220, 220, 220))
+        pen.setWidth(1)
+        painter.setPen(pen)
+
+        left = int(rect.left()) - (int(rect.left()) % self.grid_size)
+        top = int(rect.top()) - (int(rect.top()) % self.grid_size)
+
+        x = left
+        while x < rect.right():
+            painter.drawLine(x, rect.top(), x, rect.bottom())
+            x += self.grid_size
+
+        y = top
+        while y < rect.bottom():
+            painter.drawLine(rect.left(), y, rect.right(), y)
+            y += self.grid_size
+
+
+class LeftPanelEditor(QWidget):
+    def __init__(self, anim_obj = None, parent=None):
+        super().__init__(parent)
+
+        layout = QVBoxLayout(self)
+
+        self.scene = GridScene(self, grid_size=25)
+        self.scene.selectionChanged.connect(self._selection_changed)
+
+        self.view = QGraphicsView(self.scene)
+
+        self.view.setRenderHint(QPainter.Antialiasing)
+        self.view.setRenderHint(QPainter.SmoothPixmapTransform)
+
+        layout.addWidget(self.view)
+
+        self.anim_obj = anim_obj 
+        self._output_rect_item = None
+        self._output_center = QPointF(184, 256)
+        self.on_object_selected = None
+        self.on_set_project = None
+        self.on_items_changed = None
+
+    def set_animation(self, anim_obj):
+        pass
+
+    def set_project(self, project):
+        self.project = project
+
+        for item in list(self.scene.items()):
+            if item is self._output_rect_item:
+                continue
+            self.scene.removeItem(item)
+
+        for item in project.items:
+            self.scene.addItem(item)
+
+        self.update_output_rect(project.output_width, project.output_height)
+        self.on_set_project(self.project)
+        self.on_items_changed()
+
+    def update_output_rect(self, w, h):
+        center = self._output_center
+
+        rect = QRectF(center.x() - w / 2, center.y() - h / 2, w, h)
+
+        if self._output_rect_item is None:
+            self._output_rect_item = QGraphicsRectItem()
+            pen = QPen(Qt.red)
+            pen.setWidth(2)
+            self._output_rect_item.setPen(pen)
+            self._output_rect_item.setBrush(Qt.NoBrush)
+            self._output_rect_item.setZValue(10**9)
+            self.scene.addItem(self._output_rect_item)
+
+        self._output_rect_item.setRect(rect)
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Delete:
+            self.delete_selected_items()
+        else:
+            super().keyPressEvent(event)
+
+    def delete_selected_items(self):
+        selected_items = self.scene.selectedItems()
+
+        for item in selected_items:
+            self.scene.removeItem(item)
+            self.project.delete_item(item)
+
+        self.on_items_changed()
+
+    def _selection_changed(self):
+        items = self.scene.selectedItems()
+        selected = items[0] if items else None
+
+        if self.on_object_selected is not None:
+            self.on_object_selected(selected)
+        
+        self.on_items_changed()

@@ -66,6 +66,7 @@ class MainWindow(QMainWindow):
         self.right_panel.btn_text.clicked.connect(self.ui.create_text)
         self.right_panel.btn_animation.clicked.connect(self.ui.create_animation)
         self.anim_editor.btn_back.clicked.connect(self._exit_animation_editor)
+        self.anim_editor.center_panel.btn_add_text.clicked.connect(self.ui.create_text_anim)
 
         self.right_panel.sp_w.valueChanged.connect(self.ui.work_space)
         self.right_panel.sp_h.valueChanged.connect(self.ui.work_space)
@@ -74,10 +75,11 @@ class MainWindow(QMainWindow):
         self.left_panel.on_object_selected = self.right_panel.set_selected_object
         self.left_panel.on_set_project = self.right_panel.set_project
         self.left_panel.on_items_changed = self.right_panel.refresh_layers
+        self.anim_editor.left_panel.on_items_changed = self.anim_editor.center_panel.refresh_layers
         self.right_panel.edit_animation = self._enter_editor
 
-    def _enter_editor(self, animation_obj):
-        self.anim_editor.obj = animation_obj
+    def _enter_editor(self, anim_obj):
+        self.anim_editor.set_animation(anim_obj)
         self.stack.setCurrentIndex(1)
 
     def _exit_animation_editor(self):
