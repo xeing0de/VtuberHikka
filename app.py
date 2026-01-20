@@ -14,6 +14,7 @@ from PySide6.QtCore import Qt
 from panels import LeftPanel, RightPanel
 from buttons import UI
 from objects import Project
+from editor import AnimationEditor
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -53,19 +54,8 @@ class MainWindow(QMainWindow):
         self.stack.addWidget(editor_page)
 
         ##editor
-        self.anim_page = QWidget()
-        anim_layout = QVBoxLayout(self.anim_page)
-
-        self.anim_title = QLabel("Animation editor")
-        self.anim_title.setAlignment(Qt.AlignCenter)
-
-        self.btn_back_from_anim = QPushButton("Back")
-
-        anim_layout.addWidget(self.anim_title)
-        anim_layout.addWidget(self.btn_back_from_anim)
-        anim_layout.addStretch(1)
-
-        self.stack.addWidget(self.anim_page)
+        self.anim_editor = AnimationEditor()
+        self.stack.addWidget(self.anim_editor)
 
         #buttons
         self.ui = UI(self)
@@ -75,7 +65,7 @@ class MainWindow(QMainWindow):
         self.right_panel.btn_limage.clicked.connect(self.ui.load_image)
         self.right_panel.btn_text.clicked.connect(self.ui.create_text)
         self.right_panel.btn_animation.clicked.connect(self.ui.create_animation)
-        self.btn_back_from_anim.clicked.connect(self._exit_animation_editor)
+        self.anim_editor.btn_back.clicked.connect(self._exit_animation_editor)
 
         self.right_panel.sp_w.valueChanged.connect(self.ui.work_space)
         self.right_panel.sp_h.valueChanged.connect(self.ui.work_space)
@@ -87,8 +77,7 @@ class MainWindow(QMainWindow):
         self.right_panel.edit_animation = self._enter_editor
 
     def _enter_editor(self, animation_obj):
-        name = getattr(animation_obj, "name", "Animation")
-        self.anim_title.setText(f"Animation editor: {name}")
+        self.anim_editor.obj = animation_obj
         self.stack.setCurrentIndex(1)
 
     def _exit_animation_editor(self):
