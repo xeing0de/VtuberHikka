@@ -8,7 +8,10 @@ class AnimationProp(BaseProp):
         self.btn_edit_animation = QPushButton("Edit animation")
         self.main_layout.addWidget(self.btn_edit_animation)
         self.main_layout.addStretch(1)
+        self.btn_edit_animation.clicked.connect(self._edit_animation)
 
         self.set_object(obj)
-
+    
+    def _edit_animation(self):
+        self.panel.request_edit_animation(self.obj)
 

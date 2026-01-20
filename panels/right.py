@@ -22,6 +22,8 @@ class RightPanel(QWidget):
         self.project = project
         self.scene = scene
         self.selected_object = None
+        self.edit_animation = None
+
         self._uid_to_obj = {o.uid: o for o in self.project.items}
 
         layout = QVBoxLayout(self)
@@ -236,7 +238,9 @@ class RightPanel(QWidget):
 
         self.project.items.sort(key=lambda o: o.zValue())
         self.refresh_layers()
-
+    
+    def request_edit_animation(self, obj):
+        self.edit_animation(obj)
 
 class LayersList(QListWidget):
     def __init__(self, parent=None):
