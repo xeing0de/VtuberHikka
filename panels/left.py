@@ -9,27 +9,41 @@ class GridScene(QGraphicsScene):
     def __init__(self, parent=None, grid_size=25):
         super().__init__(parent)
         self.grid_size = grid_size
+        self.grid_center = QPointF(184, 256)
 
     def drawBackground(self, painter: QPainter, rect: QRectF):
         super().drawBackground(painter, rect)
-
+        
         pen = QPen(QColor(220, 220, 220))
         pen.setWidth(1)
         painter.setPen(pen)
 
-        left = int(rect.left()) - (int(rect.left()) % self.grid_size)
-        top = int(rect.top()) - (int(rect.top()) % self.grid_size)
+        gs = self.grid_size
+        cx = self.grid_center.x()
+        cy = self.grid_center.y()
+
+        left = rect.left() - ((rect.left() - cx) % gs)
+        right = rect.right()
+        top = rect.top() - ((rect.top() - cy) % gs)
+        bottom = rect.bottom()
 
         x = left
-        while x < rect.right():
-            painter.drawLine(x, rect.top(), x, rect.bottom())
-            x += self.grid_size
+        while x <= right:
+            painter.drawLine(x, top, x, bottom)
+            x += gs
 
         y = top
-        while y < rect.bottom():
-            painter.drawLine(rect.left(), y, rect.right(), y)
-            y += self.grid_size
+        while y <= bottom:
+            painter.drawLine(left, y, right, y)
+            y += gs
 
+        pen = QPen(QColor(255, 0, 0))
+        pen.setWidth(2)
+        painter.setPen(pen)
+
+        cross = 20
+        painter.drawLine(cx - cross, cy, cx + cross, cy)
+        painter.drawLine(cx, cy - cross, cx, cy + cross)
 
 class LeftPanel(QWidget):
     def __init__(self, project, parent=None):
